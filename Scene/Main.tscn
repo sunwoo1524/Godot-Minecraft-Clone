@@ -1,8 +1,36 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Scene/src/Main.gd" type="Script" id=1]
 [ext_resource path="res://Scene/Player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://image/aim_point.png" type="Texture" id=3]
+
+[sub_resource type="SpatialMaterial" id=1]
+params_blend_mode = 1
+albedo_color = Color( 1, 1, 1, 0 )
+
+[sub_resource type="CubeMesh" id=2]
+material = SubResource( 1 )
+size = Vector3( 2.01, 2.01, 2.01 )
+
+[sub_resource type="GDScript" id=3]
+resource_name = "Highlighter"
+script/source = "extends MeshInstance
+
+
+func _ready():
+	pass
+
+
+func _on_Player_highlight_block(block_x, block_y, block_z):
+	transform.origin.x = block_x
+	transform.origin.y = block_y
+	transform.origin.z = block_z
+	self.visible = true
+
+
+func _on_Player_unhighlight_block():
+	self.visible = false
+"
 
 [node name="Main" type="Node"]
 script = ExtResource( 1 )
@@ -23,7 +51,15 @@ margin_bottom = 15.0
 texture = ExtResource( 3 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.352152, 0.935943, 0, -0.935943, 0.352152, 0, 22.1788, 0 )
+transform = Transform( 1, 0, 0, 0, 0.352152, 0.935943, 0, -0.935943, 0.352152, 0, 98.9199, 0 )
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.09727, 0 )
+
+[node name="HighLighter" type="MeshInstance" parent="."]
+visible = false
+mesh = SubResource( 2 )
+script = SubResource( 3 )
+
+[connection signal="highlight_block" from="Player" to="HighLighter" method="_on_Player_highlight_block"]
+[connection signal="unhighlight_block" from="Player" to="HighLighter" method="_on_Player_unhighlight_block"]
